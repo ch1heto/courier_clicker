@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Кликер Курьер</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f0f0f0;
+      text-align: center;
+      padding: 2rem;
+    }
+    button {
+      padding: 1rem 2rem;
+      margin: 1rem;
+      font-size: 1.2rem;
+      border-radius: 10px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    #stats {
+      margin-bottom: 1.5rem;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <h2>🛵 Курьер Кликер</h2>
+  <div id="stats">
+    💰 Деньги: <span id="money">0</span><br>
+    🚀 Скорость: <span id="speed">1</span><br>
+    🧍 Помощники: <span id="helpers">0</span>
+  </div>
+  <button onclick="clickMoney()">👆 Клик</button><br>
+  <button onclick="upgradeSpeed()">🚀 Улучшить скорость (20)</button><br>
+  <button onclick="hireHelper()">🧍‍♂️ Нанять помощника (10)</button>
+
+  <script>
+    Telegram.WebApp.expand();
+
+    let money = 0;
+    let speed = 1;
+    let helpers = 0;
+    let helperCost = 10;
+
+    function updateStats() {
+      document.getElementById("money").innerText = money;
+      document.getElementById("speed").innerText = speed;
+      document.getElementById("helpers").innerText = helpers;
+    }
+
+    function clickMoney() {
+      money += speed;
+      updateStats();
+    }
+
+    function upgradeSpeed() {
+      if (money >= 20) {
+        money -= 20;
+        speed += 1;
+        updateStats();
+      } else {
+        alert("Недостаточно денег 💸");
+      }
+    }
+
+    function hireHelper() {
+      if (money >= helperCost) {
+        money -= helperCost;
+        helpers += 1;
+        helperCost += 5;
+        updateStats();
+      } else {
+        alert("Не хватает на помощника 🧍");
+      }
+    }
+
+    // Авто-доход от помощников
+    setInterval(() => {
+      money += helpers;
+      updateStats();
+    }, 5000);
+
+  function saveProgress() {
+    const tg = window.Telegram.WebApp.initDataUnsafe;
+
+    fetch("https://your-replit-name.repl.co/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: tg.user.id,
+        money: money,
+        speed: speed,
+        assistants: helpers,
+        assistant_cost: helperCost
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log("✅ Прогресс отправлен:", data);
+    });
+  }
+
+  </script>
+</body>
+</html>
